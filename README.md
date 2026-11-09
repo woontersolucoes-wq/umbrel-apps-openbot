@@ -91,7 +91,28 @@ No terminal do umbrelOS, com o app parado:
 O backup é da versão anterior ao update. As migrações do OpenBot não voltam, então rode esse backup
 com a imagem da mesma versão.
 
-## Licença
+## Aviso de responsabilidade
 
-O OpenBot usa a licença PolyForm Noncommercial 1.0.0: uso pessoal e não comercial é livre, uso
-comercial exige licença da Synthetify Labs (licenses@openbot.run). Veja o arquivo NOTICE.
+Este é um pacote comunitário e não oficial. Ele não tem ligação com a Nightly Labs, a Synthetify
+Labs (autoras do OpenBot) nem com o Umbrel.
+
+O pacote só instala a ferramenta OpenBot, baixada direto da Nightly Labs. O OpenBot usa a licença
+PolyForm Noncommercial 1.0.0: uso pessoal e não comercial é livre, e uso comercial exige licença
+da Synthetify Labs (licenses@openbot.run). Veja o arquivo NOTICE.
+
+Quem instala é o único responsável por:
+
+- cumprir a licença do OpenBot e os termos dos provedores de IA que conectar;
+- os custos de assinaturas, chaves de API e uso dos provedores;
+- o que os agentes fazem, os dados que acessam e o que publicam;
+- a segurança e os backups do próprio servidor.
+
+O pacote é fornecido "no estado em que se encontra", sem garantia de nenhum tipo. O autor deste
+repositório não responde por perdas, danos, custos ou violações que resultem da instalação ou do
+uso.
+
+English: unofficial community package, not affiliated with Nightly Labs, Synthetify Labs or
+Umbrel. It installs OpenBot, which is licensed under PolyForm Noncommercial 1.0.0 (commercial use
+requires a license from licenses@openbot.run). Provided "as is", without warranty. Whoever
+installs it is solely responsible for license compliance, provider costs and everything the
+agents do.
