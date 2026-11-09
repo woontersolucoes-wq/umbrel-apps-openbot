@@ -1,0 +1,26 @@
+name: Atualizar OpenBot
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: update-openbot
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conferir versão nova
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/update-openbot.sh
