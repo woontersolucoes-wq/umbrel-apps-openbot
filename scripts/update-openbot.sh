@@ -24,18 +24,42 @@ if (( fixed )); then
   git push
 fi
 
-current="$(sed -n 's/^version: "\(.*\)"$/\1/p' "${APP}/umbrel-app.yml")"
+# Versão do app = versão do OpenBot, com sufixo -patch.N quando só o pacote muda
+# (mesmo formato dos apps oficiais do Umbrel, por exemplo 0.22.5-patch.2).
+# Sem mudar a versão, o Umbrel não entrega a correção a quem já instalou.
+version_of() { sed -n 's/^version: "\(.*\)"$/\1/p' "$1"; }
+
+if [[ "${GITHUB_EVENT_NAME:-}" == "push" && -n "${PUSH_BEFORE:-}" && ! "${PUSH_BEFORE}" =~ ^0+$ ]] \
+   && git cat-file -e "${PUSH_BEFORE}^{commit}" 2>/dev/null; then
+  changed="$(git diff --name-only "${PUSH_BEFORE}" HEAD -- "${APP}" | grep -v "^${APP}/umbrel-app.yml$" || true)"
+  before_version="$(git show "${PUSH_BEFORE}:${APP}/umbrel-app.yml" 2>/dev/null | sed -n 's/^version: "\(.*\)"$/\1/p' || true)"
+  now_version="$(version_of "${APP}/umbrel-app.yml")"
+  if [[ -n "${changed}" && "${before_version}" == "${now_version}" ]]; then
+    base="${now_version%%-patch.*}"
+    n=0
+    [[ "${now_version}" == *-patch.* ]] && n="${now_version##*-patch.}"
+    patched="${base}-patch.$((n + 1))"
+    sed -i -E "s#^version: \".*\"#version: \"${patched}\"#" "${APP}/umbrel-app.yml"
+    echo "Pacote mudou sem troca de versão:"; echo "${changed}"
+    git add "${APP}/umbrel-app.yml"
+    git commit -m "Pacote: versão ${patched}"
+    git push
+  fi
+fi
+
+current="$(version_of "${APP}/umbrel-app.yml")"
+current_base="${current%%-patch.*}"
 tag="$(gh api "repos/${UPSTREAM}/releases/latest" --jq .tag_name)"
 new="${tag#v}"
 
 if [[ ! "${new}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Tag inesperada: ${tag}. Nada feito."; exit 0
 fi
-if [[ "${new}" == "${current}" ]]; then
-  echo "Já na versão ${current}."; exit 0
+if [[ "${new}" == "${current_base}" ]]; then
+  echo "OpenBot já na versão ${new} (pacote ${current})."; exit 0
 fi
-if [[ "$(printf '%s\n%s\n' "${current}" "${new}" | sort -V | tail -n 1)" != "${new}" ]]; then
-  echo "A versão publicada (${new}) é mais antiga que a da loja (${current}). Nada feito."; exit 0
+if [[ "$(printf '%s\n%s\n' "${current_base}" "${new}" | sort -V | tail -n 1)" != "${new}" ]]; then
+  echo "A versão publicada (${new}) é mais antiga que a da loja (${current_base}). Nada feito."; exit 0
 fi
 echo "Nova versão: ${current} -> ${new}"
 
