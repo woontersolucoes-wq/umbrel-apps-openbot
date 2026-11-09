@@ -20,7 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Conferir versão nova
         env:
           GH_TOKEN: ${{ github.token }}
+          PUSH_BEFORE: ${{ github.event.before }}
         run: bash scripts/update-openbot.sh
