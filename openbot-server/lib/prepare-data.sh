@@ -36,6 +36,7 @@ EOF
 if [[ "${1:-}" == "--firewall-ok" ]]; then
   echo "${VERSION}" > "${STATUS}/last-version"
   write_status "ok" "Iniciado" "ativo"
+  (umask 022; cat /proc/sys/kernel/random/boot_id > "${STATUS}/firewall-ok")
   exit 0
 fi
 
