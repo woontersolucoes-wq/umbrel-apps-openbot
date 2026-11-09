@@ -1,0 +1,38 @@
+manifestVersion: 1.1
+id: woonter-openbot
+category: ai
+name: OpenBot
+version: "0.65.0"
+tagline: Servidor de agentes de IA do OpenBot, isolado da sua rede local
+icon: https://raw.githubusercontent.com/woontersolucoes-wq/umbrel-apps-openbot/main/woonter-openbot/icon.svg
+description: >-
+  Roda o servidor do OpenBot (Nightly Labs) no Umbrel. Os agentes, arquivos e
+  conversas ficam neste servidor. Você usa o OpenBot pelo app desktop, pelo
+  iPhone ou por openbot.run/app, com a mesma conta.
+
+
+  Este pacote da loja Woonter acrescenta três proteções ao container oficial:
+  firewall que impede os agentes de acessar a rede local e o próprio Umbrel,
+  backup automático de /data antes de cada troca de versão e limites de CPU e
+  memória para não atrapalhar os outros apps.
+
+
+  O ícone abre uma página de status com a versão, o último backup e os
+  comandos de login.
+releaseNotes: >-
+  OpenBot v0.65.0. Notas da versão:
+  https://github.com/nightly-labs/openbot/releases/tag/v0.65.0
+developer: Nightly Labs
+website: https://openbot.run
+dependencies: []
+repo: https://github.com/nightly-labs/openbot
+support: https://github.com/nightly-labs/openbot/issues
+port: 3110
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+backupIgnore:
+  - data/backups/*
+submitter: Woonter
+submission: https://github.com/woontersolucoes-wq/umbrel-apps-openbot

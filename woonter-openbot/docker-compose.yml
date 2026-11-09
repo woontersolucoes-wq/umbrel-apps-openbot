@@ -1,0 +1,51 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: woonter-openbot_status_1
+      APP_PORT: 8080
+    container_name: woonter-openbot_app_proxy_1
+
+  # Página de status aberta pelo ícone. Só leitura, sem privilégios.
+  status:
+    image: docker.io/library/busybox:1.37.0@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec
+    restart: on-failure
+    user: "65534:65534"
+    read_only: true
+    command: ["httpd", "-f", "-p", "8080", "-h", "/www"]
+    volumes:
+      - ${APP_DATA_DIR}/www/index.html:/www/index.html:ro
+      - ${APP_DATA_DIR}/data/status:/www/status:ro
+    container_name: woonter-openbot_status_1
+
+  # Servidor oficial do OpenBot. Mesmas opções do compose.yaml oficial,
+  # mais limites de recursos e uma rede isolada (ver hooks/pre-start).
+  server:
+    image: ghcr.io/nightly-labs/openbot:v0.65.0@sha256:805aa13d29ca2fe299e5fcd7f815d5f851bc5ea1efa7a6e9cb4e4b6db2029c21
+    restart: on-failure
+    stop_grace_period: 60s
+    shm_size: 1g
+    mem_limit: 6g
+    cpus: 4
+    pids_limit: 4096
+    security_opt:
+      - seccomp=${APP_DATA_DIR}/seccomp.json
+      - no-new-privileges:true
+    dns:
+      - 1.1.1.1
+      - 9.9.9.9
+    volumes:
+      - ${APP_DATA_DIR}/data/openbot:/data
+    networks:
+      - isolated
+    container_name: woonter-openbot_server_1
+
+networks:
+  isolated:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: br-wopenbot
+    ipam:
+      config:
+        - subnet: 172.31.250.0/24

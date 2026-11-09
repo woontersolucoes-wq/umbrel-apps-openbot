@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Executado pelo umbrelOS antes de cada start do app.
+# Só o firewall precisa de privilégio. Todo o resto roda como UID 1000,
+# o mesmo usuário dono dos dados do OpenBot.
+set -euo pipefail
+
+APP_DIR="${APP_DATA_DIR:?}"
+BRIDGE="br-wopenbot"
+TAG="woonter-openbot"
+PRIVATE_NETS="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 169.254.0.0/16 100.64.0.0/10 224.0.0.0/4"
+
+# 1. Pastas, backup e status, sem privilégio.
+setpriv --reuid=1000 --regid=1000 --init-groups --no-new-privs \
+  env APP_DATA_DIR="${APP_DIR}" bash "${APP_DIR}/lib/prepare-data.sh"
+
+# 2. Firewall: o container só alcança a internet.
+add_rule() {
+  local chain="$1"; shift
+  iptables -C "${chain}" "$@" 2>/dev/null || iptables -I "${chain}" 1 "$@"
+}
+for net in ${PRIVATE_NETS}; do
+  add_rule DOCKER-USER -i "${BRIDGE}" -d "${net}" -m comment --comment "${TAG}" -j DROP
+done
+add_rule INPUT -i "${BRIDGE}" -m comment --comment "${TAG}" -j DROP
+
+setpriv --reuid=1000 --regid=1000 --init-groups --no-new-privs \
+  env APP_DATA_DIR="${APP_DIR}" bash "${APP_DIR}/lib/prepare-data.sh" --firewall-ok

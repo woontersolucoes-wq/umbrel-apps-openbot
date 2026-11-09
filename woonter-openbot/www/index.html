@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenBot no Umbrel</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#5f6b7a; --line:#e3e7ec; --ok:#1a7f4b; --err:#b42318; --accent:#2f5fd0; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#12151b; --card:#1b2029; --text:#e8ecf2; --muted:#9aa5b4; --line:#2a313c; --ok:#4ccf8a; --err:#ff7b72; --accent:#7aa2ff; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:32px 16px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  p.sub { color:var(--muted); margin:0 0 24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:16px; }
+  dl { display:grid; grid-template-columns:max-content 1fr; gap:8px 16px; margin:0; }
+  dt { color:var(--muted); }
+  dd { margin:0; word-break:break-word; }
+  .ok { color:var(--ok); font-weight:600; }
+  .err { color:var(--err); font-weight:600; }
+  a.btn { display:inline-block; background:var(--accent); color:#fff; text-decoration:none; padding:10px 16px; border-radius:8px; font-weight:600; }
+  code { display:block; background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px; margin:6px 0 14px; overflow-x:auto; white-space:pre; font-size:13px; }
+  h2 { font-size:16px; margin:0 0 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>OpenBot no Umbrel</h1>
+  <p class="sub">Este servidor não tem tela própria. Você usa o OpenBot pelo app, com a mesma conta.</p>
+
+  <div class="card">
+    <h2>Status do último start</h2>
+    <dl id="status"><dt>Carregando</dt><dd>...</dd></dl>
+  </div>
+
+  <div class="card">
+    <a class="btn" href="https://openbot.run/app" target="_blank" rel="noopener">Abrir openbot.run/app</a>
+  </div>
+
+  <div class="card">
+    <h2>Comandos no terminal do umbrelOS</h2>
+    Vincular este servidor à sua conta (uma vez, troque NOME pelo nome que vai aparecer no app):
+    <code>docker exec -it woonter-openbot_server_1 openbot login --name NOME</code>
+    Ver o estado e a memória:
+    <code>docker exec woonter-openbot_server_1 openbot status</code>
+    Ler o log:
+    <code>docker logs --tail 100 woonter-openbot_server_1</code>
+    Conectar o app do celular:
+    <code>docker exec -it woonter-openbot_server_1 openbot mobile-connect</code>
+  </div>
+</main>
+<script>
+  const labels = { version:"Versão", started_at:"Iniciado em (UTC)", state:"Estado", message:"Mensagem", firewall:"Firewall", last_backup:"Último backup", backups:"Backups guardados" };
+  const el = document.getElementById("status");
+  fetch("status/status.json", { cache:"no-store" })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(s => {
+      el.innerHTML = "";
+      for (const [k, label] of Object.entries(labels)) {
+        const dt = document.createElement("dt"); dt.textContent = label;
+        const dd = document.createElement("dd"); dd.textContent = (s[k] === "" || s[k] == null) ? "nenhum" : String(s[k]);
+        if (k === "state" || k === "firewall") dd.className = (s[k] === "ok" || s[k] === "ativo") ? "ok" : "err";
+        el.append(dt, dd);
+      }
+    })
+    .catch(() => { el.innerHTML = '<dt>Erro</dt><dd class="err">Não consegui ler o status.</dd>'; });
+</script>
+</body>
+</html>
