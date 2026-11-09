@@ -19,6 +19,13 @@ description: >-
 
   O ícone abre uma página de status com a versão, o último backup e os
   comandos de login.
+
+
+  Aviso: pacote comunitário e não oficial, sem ligação com a Nightly Labs ou o
+  Umbrel. O OpenBot usa a licença PolyForm Noncommercial (uso comercial exige
+  licença em licenses@openbot.run). Sem garantia. Quem instala é o único
+  responsável pela licença, pelos custos dos provedores de IA e pelo que os
+  agentes fazem.
 releaseNotes: >-
   OpenBot v0.65.0. Notas da versão:
   https://github.com/nightly-labs/openbot/releases/tag/v0.65.0
