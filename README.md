@@ -13,9 +13,24 @@ oficial e acrescenta:
 - Limites de 4 CPUs, 6 GB de RAM e 4096 processos.
 - Página de status no ícone do Umbrel, atrás do login do Umbrel.
 - Imagem fixada por versão e digest, atualizada por um robô (GitHub Actions).
+- Trava de segurança: o OpenBot só inicia depois que o firewall foi aplicado no boot atual.
 
 Requisitos: umbrelOS 1.x ou 2.x, amd64 ou arm64, 4 GB de RAM livres e uma conta no OpenBot.
 O provedor de IA (assinatura ou chave de API) é conectado pelo app do OpenBot.
+
+Testado em umbrelOS 2.1 (x86_64). Em umbrelOS 1.x e arm64 o pacote segue o mesmo formato, mas
+ainda não foi testado.
+
+## Quando precisa de root
+
+A instalação, as atualizações e a desinstalação são pela interface do Umbrel, sem root.
+O root aparece em dois momentos, sempre com `sudo` e a senha do usuário umbrel:
+
+- Login do OpenBot e comandos de diagnóstico (`sudo docker ...`), mostrados na página de status.
+- Restaurar um backup.
+
+Os hooks do app rodam com privilégio pelo próprio umbrelOS, como em qualquer app da loja oficial.
+Só as regras de firewall usam esse privilégio. Pastas, backup e status rodam como usuário umbrel.
 
 ## Instalar
 
@@ -43,13 +58,21 @@ Depois da revisão, copie os arquivos novos para `upstream/compose.yaml` e
 Para usar em um fork, troque `woontersolucoes-wq/umbrel-apps-openbot` pelo seu repositório em
 `openbot-server/umbrel-app.yml`.
 
-## Rede
+## Rede e segurança
 
-O OpenBot usa a rede `172.31.250.0/24` (bridge `br-openbot`). Se essa faixa já existir na sua
-rede, troque a sub-rede em `openbot-server/docker-compose.yml`.
+O OpenBot fica numa rede própria (bridge `br-openbot`). O Docker escolhe a faixa livre
+automaticamente, então não há conflito com a sua rede.
 
 O firewall bloqueia 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16, 100.64.0.0/10 e
-multicast. As regras ficam nas chains DOCKER-USER e INPUT com o comentário `openbot-server`.
+multicast. As regras ficam nas chains DOCKER-USER e INPUT com o comentário `openbot-server` e
+são removidas ao desinstalar o app (hook `pre-uninstall`).
+
+O umbrelOS ignora erros de hook. Por isso o hook grava `data/status/firewall-ok` com o boot_id
+atual só depois de aplicar as regras, e o container `guard` confere esse arquivo. Se o arquivo
+faltar ou for de outro boot, o OpenBot não inicia e a página de status mostra o motivo.
+
+Os agentes do OpenBot têm acesso total dentro do container (arquivos, comandos, rede e navegador).
+Rode só agentes em que você confia.
 
 ## Restaurar um backup
 
@@ -62,3 +85,8 @@ No terminal do umbrelOS, com o app parado:
 
 O backup é da versão anterior ao update. As migrações do OpenBot não voltam, então rode esse backup
 com a imagem da mesma versão.
+
+## Licença
+
+O OpenBot usa a licença PolyForm Noncommercial 1.0.0: uso pessoal e não comercial é livre, uso
+comercial exige licença da Synthetify Labs (licenses@openbot.run). Veja o arquivo NOTICE.

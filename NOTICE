@@ -1,0 +1,13 @@
+Este repositório empacota o OpenBot para o umbrelOS. Ele não inclui o programa do OpenBot.
+O app baixa a imagem oficial ghcr.io/nightly-labs/openbot direto da Nightly Labs.
+
+Os arquivos abaixo são cópias de https://github.com/nightly-labs/openbot e seguem a licença
+PolyForm Noncommercial 1.0.0 (https://polyformproject.org/licenses/noncommercial/1.0.0):
+
+  openbot-server/seccomp.json
+  upstream/compose.yaml
+
+Required Notice: Copyright 2026 Synthetify Labs spółka z ograniczoną odpowiedzialnością.
+Required Notice: For a commercial license, contact licenses@openbot.run.
+
+O OpenBot é livre para uso não comercial. Uso comercial exige licença da Synthetify Labs.
