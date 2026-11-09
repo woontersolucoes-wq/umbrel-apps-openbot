@@ -55,6 +55,11 @@ Quando esses arquivos mudam, o workflow abre uma issue com o diff e não atualiz
 Depois da revisão, copie os arquivos novos para `upstream/compose.yaml` e
 `openbot-server/seccomp.json`, ajuste o `docker-compose.yml` se preciso e rode o workflow manualmente.
 
+A versão do app acompanha a do OpenBot. Quando só o pacote muda (hook, compose, página de
+status), o robô acrescenta `-patch.N` à versão, no mesmo formato dos apps oficiais do Umbrel
+(por exemplo `0.65.0-patch.1`). Assim a correção também aparece como atualização para quem já
+instalou. A próxima versão do OpenBot volta ao número limpo.
+
 Para usar em um fork, troque `woontersolucoes-wq/umbrel-apps-openbot` pelo seu repositório em
 `openbot-server/umbrel-app.yml`.
 
