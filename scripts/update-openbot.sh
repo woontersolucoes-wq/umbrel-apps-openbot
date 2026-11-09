@@ -4,11 +4,11 @@
 # Se mudaram, abre uma issue para revisão e não mexe em nada.
 set -euo pipefail
 
-APP="woonter-openbot"
+APP="openbot-server"
 IMAGE="ghcr.io/nightly-labs/openbot"
 UPSTREAM="nightly-labs/openbot"
 
-git config user.name "woonter-bot"
+git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 # Upload pelo site do GitHub não marca scripts como executáveis. O Umbrel precisa disso no hook.
