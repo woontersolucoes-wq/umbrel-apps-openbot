@@ -19,10 +19,32 @@ services:
       - ${APP_DATA_DIR}/data/status:/www/status:ro
     container_name: openbot-server_status_1
 
+  # Trava de segurança. O umbrelOS ignora erros de hook, então o servidor só
+  # sobe se o hooks/pre-start terminou e aplicou o firewall neste boot.
+  guard:
+    image: docker.io/library/busybox:1.37.0@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec
+    restart: "no"
+    user: "65534:65534"
+    read_only: true
+    network_mode: none
+    command:
+      - sh
+      - -c
+      - >-
+        if [ "$$(cat /status/firewall-ok 2>/dev/null)" = "$$(cat /proc/sys/kernel/random/boot_id)" ];
+        then echo "Firewall confirmado."; exit 0;
+        else echo "Firewall ausente. O OpenBot não vai iniciar. Veja a página de status."; exit 1; fi
+    volumes:
+      - ${APP_DATA_DIR}/data/status:/status:ro
+    container_name: openbot-server_guard_1
+
   # Servidor oficial do OpenBot. Mesmas opções do compose.yaml oficial,
   # mais limites de recursos e uma rede isolada (ver hooks/pre-start).
   server:
     image: ghcr.io/nightly-labs/openbot:v0.65.0@sha256:805aa13d29ca2fe299e5fcd7f815d5f851bc5ea1efa7a6e9cb4e4b6db2029c21
+    depends_on:
+      guard:
+        condition: service_completed_successfully
     restart: on-failure
     stop_grace_period: 60s
     shm_size: 1g
@@ -46,6 +68,3 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.bridge.name: br-openbot
-    ipam:
-      config:
-        - subnet: 172.31.250.0/24
