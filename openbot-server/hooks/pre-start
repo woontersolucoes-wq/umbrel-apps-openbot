@@ -2,16 +2,27 @@
 # Executado pelo umbrelOS antes de cada start do app.
 # Só o firewall precisa de privilégio. Todo o resto roda como UID 1000,
 # o mesmo usuário dono dos dados do OpenBot.
+#
+# O umbrelOS ignora o código de saída dos hooks. Por isso a confirmação é um
+# arquivo (data/status/firewall-ok) com o boot_id atual, que o container
+# "guard" confere antes de liberar o OpenBot. Sem o arquivo, o OpenBot não sobe.
 set -euo pipefail
 
 APP_DIR="${APP_DATA_DIR:?}"
+MARKER="${APP_DIR}/data/status/firewall-ok"
 BRIDGE="br-openbot"
 TAG="openbot-server"
 PRIVATE_NETS="10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 169.254.0.0/16 100.64.0.0/10 224.0.0.0/4"
 
+as_app_user() {
+  setpriv --reuid=1000 --regid=1000 --init-groups --no-new-privs \
+    env APP_DATA_DIR="${APP_DIR}" bash "${APP_DIR}/lib/prepare-data.sh" "$@"
+}
+
+rm -f "${MARKER}"
+
 # 1. Pastas, backup e status, sem privilégio.
-setpriv --reuid=1000 --regid=1000 --init-groups --no-new-privs \
-  env APP_DATA_DIR="${APP_DIR}" bash "${APP_DIR}/lib/prepare-data.sh"
+as_app_user
 
 # 2. Firewall: o container só alcança a internet.
 add_rule() {
@@ -23,5 +34,5 @@ for net in ${PRIVATE_NETS}; do
 done
 add_rule INPUT -i "${BRIDGE}" -m comment --comment "${TAG}" -j DROP
 
-setpriv --reuid=1000 --regid=1000 --init-groups --no-new-privs \
-  env APP_DATA_DIR="${APP_DIR}" bash "${APP_DIR}/lib/prepare-data.sh" --firewall-ok
+# 3. Confirmação para o guard.
+as_app_user --firewall-ok

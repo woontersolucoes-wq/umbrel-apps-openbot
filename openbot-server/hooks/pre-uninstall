@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Executado pelo umbrelOS antes de desinstalar o app.
+# Remove as regras de firewall criadas pelo hooks/pre-start.
+set -uo pipefail
+
+TAG="openbot-server"
+
+for chain in DOCKER-USER INPUT; do
+  iptables -S "${chain}" 2>/dev/null | grep -F -- "--comment ${TAG} " | while read -r rule; do
+    # Cada linha vem como "-A CHAIN ...". Troca -A por -D para remover.
+    read -r -a args <<<"${rule/#-A /-D }"
+    iptables "${args[@]}" || true
+  done
+done
+exit 0
