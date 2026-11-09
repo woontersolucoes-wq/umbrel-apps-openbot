@@ -13,7 +13,7 @@ git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
 # Upload pelo site do GitHub não marca scripts como executáveis. O Umbrel precisa disso no hook.
 fixed=0
-for f in "${APP}/hooks/pre-start" "${APP}/lib/prepare-data.sh" scripts/update-openbot.sh; do
+for f in "${APP}/hooks/pre-start" "${APP}/hooks/pre-uninstall" "${APP}/lib/prepare-data.sh" scripts/update-openbot.sh; do
   if [[ -f "${f}" && "$(git ls-files -s "${f}" | cut -c1-6)" != "100755" ]]; then
     git update-index --chmod=+x "${f}"
     fixed=1
