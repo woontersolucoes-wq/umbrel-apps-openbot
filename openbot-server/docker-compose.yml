@@ -41,7 +41,7 @@ services:
   # Servidor oficial do OpenBot. Mesmas opções do compose.yaml oficial,
   # mais limites de recursos e uma rede isolada (ver hooks/pre-start).
   server:
-    image: ghcr.io/nightly-labs/openbot:v0.65.0@sha256:805aa13d29ca2fe299e5fcd7f815d5f851bc5ea1efa7a6e9cb4e4b6db2029c21
+    image: ghcr.io/nightly-labs/openbot:v0.66.0@sha256:049c2c16130f9577c5f84ee942045ee211c78f337414cda0d2aaf4e801fb4913
     depends_on:
       guard:
         condition: service_completed_successfully
