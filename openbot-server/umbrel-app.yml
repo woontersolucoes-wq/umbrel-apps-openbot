@@ -2,7 +2,7 @@ manifestVersion: 1.1
 id: openbot-server
 category: ai
 name: OpenBot
-version: "0.68.0"
+version: "0.69.0"
 tagline: Servidor de agentes de IA do OpenBot, isolado da sua rede local
 icon: https://raw.githubusercontent.com/woontersolucoes-wq/umbrel-apps-openbot/main/openbot-server/icon.svg
 description: >-
@@ -27,8 +27,8 @@ description: >-
   responsável pela licença, pelos custos dos provedores de IA e pelo que os
   agentes fazem.
 releaseNotes: >-
-  OpenBot v0.68.0. Notas da versão:
-  https://github.com/nightly-labs/openbot/releases/tag/v0.68.0
+  OpenBot v0.69.0. Notas da versão:
+  https://github.com/nightly-labs/openbot/releases/tag/v0.69.0
 developer: Nightly Labs
 website: https://openbot.run
 dependencies: []
